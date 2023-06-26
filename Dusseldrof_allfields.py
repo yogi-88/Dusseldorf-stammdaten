@@ -10,21 +10,21 @@ import time
 import re
 
 dateTimeObj = datetime.now()
-filename = f'Duesseldrof_marketsegmentdata_{dateTimeObj.strftime("%d%m%Y-%H%M")}.xlsx'
+filename = f'Duesseldrof_allfields_{dateTimeObj.strftime("%d%m%Y-%H%M")}.xlsx'
 Duesseldrofdata = []
 
 headers = {
     "User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}
 url = 'https://www.boerse-duesseldorf.de/anleihen/{}'
-file = open("./Duesseldrof_allfields.txt")
-lines = file.read().splitlines()
+with open("./Duesseldrof_allfields.txt") as file:
+    isin_codes = file.read().splitlines()
+
 file.close()
 
+for isin in isin_codes:
+    print(isin)
 
-for Identifier in lines:
-    print(Identifier)
-
-    htmlcontent = requests.get(url.format(Identifier), headers=headers, stream=True)
+    htmlcontent = requests.get(url.format(isin), headers=headers, stream=True)
     sleep(randint(1,5))
     soup = BeautifulSoup(htmlcontent.text, 'html.parser')
     stammdaten = {}
@@ -41,8 +41,8 @@ for Identifier in lines:
     for key, value in stammdaten.items():
         translated_value = GoogleTranslator(source='auto', target='en').translate(value)
         translated_stammdaten[key] = translated_value
-    print(translated_stammdaten)
-    tempdata = {'ISIN': Identifier,
+    # print(translated_stammdaten)
+    tempdata = {'ISIN': isin,
                 'Security Available': "Yes" if len(translated_stammdaten) > 0 else "Not available on website.",
                 'Security Type': translated_stammdaten.get('Wertpapiertyp', 'n/a'),
                 'WKN': translated_stammdaten.get('WKN', 'n/a'),
@@ -60,5 +60,5 @@ for Identifier in lines:
                 }
     Duesseldrofdata.append(tempdata)
 df = pd.DataFrame.from_dict(Duesseldrofdata)
-print(df)
+df.to_excel(filename, index=False)
 
