@@ -43,6 +43,7 @@ for Identifier in lines:
         translated_stammdaten[key] = translated_value
     print(translated_stammdaten)
     tempdata = {'ISIN': Identifier,
+                'Security Available': "Yes" if len(translated_stammdaten) > 0 else "Not available on website.",
                 'Security Type': translated_stammdaten.get('Wertpapiertyp', 'n/a'),
                 'WKN': translated_stammdaten.get('WKN', 'n/a'),
                 'Currency': translated_stammdaten.get('Währung', 'n/a'),
@@ -52,7 +53,7 @@ for Identifier in lines:
                 'Denomination': translated_stammdaten.get('Stückelung', 'n/a'),
                 'Coupon': translated_stammdaten.get('Kupon', 'n/a'),
                 'Coupon Type': translated_stammdaten.get('Kupontyp', 'n/a'),
-                'Due Date': translated_stammdaten['Fälligkeit'],
+                'Due Date': translated_stammdaten.get('Fälligkeit', 'n/a'),
                 'Previous Coupon': translated_stammdaten.get('Vorheriger Kupon', 'n/a'),
                 'Next Coupon': translated_stammdaten.get('Nächster Kupon', 'n/a'),
                 'Interest Date': translated_stammdaten.get('Zinstermin', 'n/a')
